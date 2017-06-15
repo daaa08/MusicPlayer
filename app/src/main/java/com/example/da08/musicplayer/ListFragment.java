@@ -10,10 +10,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.da08.musicplayer.dummy.DummyContent;
+import com.example.da08.musicplayer.Domain.Music;
 import com.example.da08.musicplayer.dummy.DummyContent.DummyItem;
 
-public class ItemFragment extends Fragment {
+public class ListFragment extends Fragment {
 
     // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
@@ -21,13 +21,13 @@ public class ItemFragment extends Fragment {
     private int mColumnCount = 1;
     private OnListFragmentInteractionListener mListener;
 
-    public ItemFragment() {
+    public ListFragment() {
     }
 
     // TODO: Customize parameter initialization
     @SuppressWarnings("unused")
-    public static ItemFragment newInstance(int columnCount) {
-        ItemFragment fragment = new ItemFragment();
+    public static ListFragment newInstance(int columnCount) {
+        ListFragment fragment = new ListFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_COLUMN_COUNT, columnCount);
         fragment.setArguments(args);
@@ -57,7 +57,12 @@ public class ItemFragment extends Fragment {
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-            recyclerView.setAdapter(new MyItemRecyclerViewAdapter(DummyContent.ITEMS, mListener));
+            // 데이터 초기화
+            Music music = Music.getInstance();
+            music.loader(getContext());  // 데이터를 미리 로드해 item에 담아둔다
+
+            ListAdapter adapter = new ListAdapter(music.getItems(), mListener);
+            recyclerView.setAdapter(adapter);
         }
         return view;
     }

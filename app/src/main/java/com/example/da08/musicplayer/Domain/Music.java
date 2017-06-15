@@ -21,7 +21,7 @@ public class Music {
         items = new HashSet<>();
     }
 
-    private Music getInstance(){
+    public static Music getInstance(){
         if(intance == null)
             intance = new Music();
 
@@ -75,20 +75,39 @@ public class Music {
 
     // set이 정상적으로 중복값을 허용하지 않도록 어떤 함수를 오버라이듷해서 구현해라
     public class Item{
-        String id;
-        String albumId;
-        String title;
-        String artist;
+        public String id;
+        public String albumId;
+        public String title;
+        public String artist;
 
-        Uri musicUri;
-        Uri albumArt;
+        public Uri musicUri;
+        public Uri albumArt;
 
         @Override
-        public boolean equals(Object obj) {
-            
-            return super.equals(obj);
+        public boolean equals(Object item) {
+            // null 체크
+            if(item == null) return false;
+            if (!(item instanceof Item)) return false;  // 객체 타입 체크
+//            Item item = (Item) o;    // 아래의 hashcode가 있기때문에 casting을 안 해줘도 됨
+            return id.hashCode() == item.hashCode();    // 키값에 hashcode 비교
+            //     id 고유의 hashcode
         }
+
+        @Override
+        public int hashCode() {
+            return id.hashCode();
+        }
+        /*
+        * String string = "문자열" + "문자열" + "문자열"         1 asd : 문자열
+          *               ----------------                  2 asdasda : 문자열문자열
+          *                     메모리        +"문자열"        3 asdasdasdasd : 문자열문자열문자열
+          *                    -------------------          4 ...
+          *                           1 asd
+          *                           2 asdasda
+          *                           3 asdasdasdasd
+          */
     }
+
 
     private Uri makeMusicUri(String musicid){
         Uri contentUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
