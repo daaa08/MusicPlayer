@@ -66,6 +66,8 @@ public class Music {
 
             }
         }
+
+        cursor.close();
     }
 
     private String getValue(Cursor cursor, String name){
