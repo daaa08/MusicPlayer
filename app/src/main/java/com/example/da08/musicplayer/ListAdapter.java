@@ -1,7 +1,6 @@
 package com.example.da08.musicplayer;
 
 import android.content.Context;
-import android.media.MediaPlayer;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -20,6 +19,7 @@ import java.util.List;
 import java.util.Set;
 
 import jp.wasabeef.glide.transformations.CropCircleTransformation;
+
 
 public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
     private final OnListFragmentInteractionListener mListener;
@@ -51,58 +51,41 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
         //Music.Item item = datas.get(position);
 
         holder.position = position;
+        holder.musicUri = datas.get(position).musicUri;
         holder.mIdView.setText(datas.get(position).id);
         holder.mContentView.setText(datas.get(position).title);
 
         Glide.with(context).load(datas.get(position).albumArt).placeholder(R.mipmap.icon).bitmapTransform(new CropCircleTransformation(context))
                 .into(holder.imgAlbum);  // 로드할 대상, 이미지를 출력할 대상
 
-    }
+        if(datas.get(position).itemClicked){
+            holder.btnPas.setVisibility(View.VISIBLE);
 
+        }else{
+            holder.btnPas.setVisibility(View.GONE);
+        }
+    }
     @Override
     public int getItemCount() {
         return datas.size();
     }
 
-    static final int STOP = 0;
-    static final int PLAY = 1;
-    static final int PAUSE = 2;
-    MediaPlayer player = null;
-    int playerstatus = STOP;
-
-
-    public void play(int position){
-        // 1 미디어 플레이어 사용하기
-        Uri musicUri = datas.get(position).musicUri;
-        if(player != null){
-            player.release();
-        }
-        player = MediaPlayer.create(context, musicUri);
-        // 2 설정
-        player.setLooping(false);  // 반복여부
-        // 3 시작
-        player.start();
-
-        playerstatus = PLAY;
-
-    }
-
-    public void pause(){
-        player.pause();
-        playerstatus = PAUSE;
-    }
-
-    public void replay(){
-        player.start();
-        playerstatus = PLAY;
-    }
-
     public void goDetail(int position){
+        mListener.goDetailInteraction(position);
+    }
 
+    public void setItemClicked(int position){
+        for(Music.Item item : datas){
+            item.itemClicked = false;
+        }
+        datas.get(position).itemClicked = true;
+        // 리스트뷰 전체를 갱신
+        notifyDataSetChanged();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         public int position;
+        public Uri musicUri;
         public final View mView;
         public final TextView mIdView;
         public final TextView mContentView;
@@ -123,9 +106,10 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
             mView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    play(position);
+                    setItemClicked(position);
+                    Player.play(musicUri, mView.getContext());
                     btnPas.setImageResource(android.R.drawable.ic_media_pause);
-                    btnPas.setVisibility(View.VISIBLE);
+//                    btnPas.setVisibility(View.VISIBLE);
                 }
             });
 
@@ -139,17 +123,18 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
                 }
             });
 
+            // pause버튼 클릭
             btnPas.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    switch(playerstatus){
-                        case PLAY:
-                            pause();
+                    switch(Player.playerstatus){
+                        case Player.PLAY:
+                            Player.pause();
                             // pause 가 클릭되면 이미지 모양이 play 로 바뀐다.
                             btnPas.setImageResource(android.R.drawable.ic_media_play);
                             break;
-                        case PAUSE:
-                            replay();
+                        case Player.PAUSE:
+                            Player.replay();
                             btnPas.setImageResource(android.R.drawable.ic_media_pause);
                             break;
                     }

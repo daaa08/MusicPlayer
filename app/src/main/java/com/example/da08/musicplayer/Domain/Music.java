@@ -17,6 +17,7 @@ public class Music {
 
     private static Music intance = null;
     private Set<Item> items = null;
+
     public Music(){
         items = new HashSet<>();
     }
@@ -34,13 +35,13 @@ public class Music {
 
     // 음악 데이터를 꺼낸다음 리스트 저장소에 담아 둠
     public void loader(Context context){
-        items.clear();  // 데이터가 계속 쌓이는 것을 방지
+//        items.clear();  // 데이터가 계속 쌓이는 것을 방지
         ContentResolver resolver = context.getContentResolver();
 
         // 1 테이블 명 정의
         Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-        // 2 가져올 컬럼 명 정의
 
+        // 2 가져올 컬럼 명 정의
         String pro[] = {
                 MediaStore.Audio.Media._ID,
                 MediaStore.Audio.Media.ALBUM_ID,  // 앨범 아트 조회
@@ -59,8 +60,6 @@ public class Music {
 
                 item.musicUri = makeMusicUri(item.id);
                 item.albumArt = makeAlbumUri(item.albumId);
-
-
                 // 데이터 담기
                 items.add(item);
 
@@ -84,6 +83,8 @@ public class Music {
 
         public Uri musicUri;
         public Uri albumArt;
+
+        public boolean itemClicked = false;
 
         @Override
         public boolean equals(Object item) {
@@ -111,14 +112,14 @@ public class Music {
     }
 
 
-    private Uri makeMusicUri(String musicid){
+    private Uri makeMusicUri(String musicId){
         Uri contentUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-        return Uri.withAppendedPath(contentUri, musicid);
+        return Uri.withAppendedPath(contentUri, musicId);
     }
 
-    private Uri makeAlbumUri(String albumid){
+    private Uri makeAlbumUri(String albumId){
         String albumUri = "content://media/external/audio/albumart/";
-        return Uri.parse(albumUri + albumid);
+        return Uri.parse(albumUri + albumId);
 
     }
 }

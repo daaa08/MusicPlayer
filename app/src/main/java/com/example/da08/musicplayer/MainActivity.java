@@ -8,9 +8,8 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.FrameLayout;
 
-import com.example.da08.musicplayer.dummy.DummyContent;
-
-public class MainActivity extends AppCompatActivity implements ListFragment.OnListFragmentInteractionListener, PermissionControl.CallBack{
+public class MainActivity extends AppCompatActivity implements ListFragment.OnListFragmentInteractionListener
+        , PermissionControl.CallBack{
 
 
     FrameLayout layout;
@@ -44,8 +43,19 @@ public class MainActivity extends AppCompatActivity implements ListFragment.OnLi
         transaction.commit();
     }
 
+    private void addFragment(Fragment fragment){
+        FragmentManager manager = getSupportFragmentManager();
+        FragmentTransaction transaction = manager.beginTransaction();
+        transaction.add(R.id.layout, fragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
+    }
+
+    // Fragment 를 통해 Adapter 까지 interface 를 전달하고
+    // Adapter 에서 interface 를 직접호출해서 사용한다.
     @Override
-    public void onListFragmentInteraction(DummyContent.DummyItem item) {
+    public void goDetailInteraction(int position) {
+        addFragment(DetailFragment.newInstance(position));
 
     }
 }
