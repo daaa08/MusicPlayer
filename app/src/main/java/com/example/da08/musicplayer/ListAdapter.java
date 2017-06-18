@@ -14,9 +14,7 @@ import com.bumptech.glide.Glide;
 import com.example.da08.musicplayer.Domain.Music;
 import com.example.da08.musicplayer.ListFragment.OnListFragmentInteractionListener;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import jp.wasabeef.glide.transformations.CropCircleTransformation;
 
@@ -28,11 +26,11 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
     // 데이터 저장소
     private final List<Music.Item> datas;  // 음악 data
 
-    public ListAdapter(Set<Music.Item> items, OnListFragmentInteractionListener listener) {
+    public ListAdapter(List<Music.Item> items, OnListFragmentInteractionListener listener) {
         mListener = listener;
 
         // set에서 data꺼내 사용을 하는데 index를 필요로 하는경우 array에 담는다
-        datas = new ArrayList<>(items);  // 공간 생성
+        datas = items;  // 공간 생성
 
     }
 

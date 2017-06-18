@@ -63,7 +63,7 @@
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
             android:layout_marginBottom="13dp"
-            app:srcCompat="@android:drawable/ic_media_pause" />
+            app:srcCompat="@android:drawable/ic_media_play" />
 
         <ImageButton
             android:id="@+id/btnNext"

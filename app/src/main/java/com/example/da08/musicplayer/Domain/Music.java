@@ -6,7 +6,9 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.provider.MediaStore;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -29,8 +31,8 @@ public class Music {
         return intance;
     }
 
-    public  Set<Item> getItems(){
-        return items;
+    public List<Item> getItems(){
+        return new ArrayList<>(items);
     }
 
     // 음악 데이터를 꺼낸다음 리스트 저장소에 담아 둠
@@ -66,7 +68,7 @@ public class Music {
             }
         }
 
-        cursor.close();
+        cursor.close();   // 커서는 꼭 닫아주기
     }
 
     private String getValue(Cursor cursor, String name){
