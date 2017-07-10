@@ -1,5 +1,7 @@
 package com.example.da08.musicplayer;
 
+import android.content.Intent;
+import android.media.AudioManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -8,16 +10,31 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.FrameLayout;
 
+import com.example.da08.musicplayer.Util.PermissionControl;
+
 public class MainActivity extends AppCompatActivity implements ListFragment.OnListFragmentInteractionListener
-        , PermissionControl.CallBack{
+        , PermissionControl.CallBack,DetailFragment.PlayerInterface{
 
 
     FrameLayout layout;
+    ListFragment list;
+    DetailFragment detail;
+
+    Intent service;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        service = new Intent(this, PlayerService.class);
+
+        // 볼륨 조절 버튼으로 미디어 음량만 조절하기 위한 설정
+        setVolumeControlStream(AudioManager.STREAM_MUSIC);
+
+        list = ListFragment.newInstance(1);
+        detail = DetailFragment.newInstance();
+
         PermissionControl.checkVersion(this);
     }
 
@@ -27,19 +44,20 @@ public class MainActivity extends AppCompatActivity implements ListFragment.OnLi
             PermissionControl.onResult(this, requestCode, grantResults);
         }
 
+    @Override
     public void init(){
-        setView();
-        setFragment(ListFragment.newInstance(1));  // 목록 프래그먼트
+        setViews();
+        setFragment(list); // 목록 프래그먼트
     }
 
-    private void setView(){
-        layout = (FrameLayout)findViewById(R.id.layout);
+    private void setViews(){
+        layout = (FrameLayout) findViewById(R.id.layout);
     }
 
     private void setFragment(Fragment fragment){
         FragmentManager manager = getSupportFragmentManager();
-        FragmentTransaction  transaction= manager.beginTransaction();
-        transaction.add(R.id.layout,fragment);
+        FragmentTransaction transaction = manager.beginTransaction();
+        transaction.add(R.id.layout, fragment);
         transaction.commit();
     }
 
@@ -55,7 +73,35 @@ public class MainActivity extends AppCompatActivity implements ListFragment.OnLi
     // Adapter 에서 interface 를 직접호출해서 사용한다.
     @Override
     public void goDetailInteraction(int position) {
-        addFragment(DetailFragment.newInstance(position));
+        detail.setPosition(position);
+        addFragment(detail);
+    }
 
+    @Override
+    protected void onDestroy() {
+        detail.setDestroy();
+        super.onDestroy();
+    }
+
+    @Override
+    public void initPlayer(){
+
+    }
+    @Override
+    public void playPlayer(){
+        // 1. 서비스를 생성하고
+        // 서비스에 명령어를 담아서 넘긴다
+        service.setAction(Const.Action.PLAY);
+        startService(service);
+    }
+    @Override
+    public void stopPlayer(){
+        service.setAction(Const.Action.STOP);
+        startService(service);
+    }
+    @Override
+    public void pausePlayer(){
+        service.setAction(Const.Action.PAUSE);
+        startService(service);
     }
 }

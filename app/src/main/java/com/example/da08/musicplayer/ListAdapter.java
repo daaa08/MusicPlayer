@@ -24,14 +24,15 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
 
     private Context context = null;
     // 데이터 저장소
-    private final List<Music.Item> datas;  // 음악 data
+    private List<Music.Item> datas;  // 음악 data
 
     public ListAdapter(List<Music.Item> items, OnListFragmentInteractionListener listener) {
         mListener = listener;
 
+    }
+    public void setDatas(List<Music.Item> datas){
         // set에서 data꺼내 사용을 하는데 index를 필요로 하는경우 array에 담는다
-        datas = items;  // 공간 생성
-
+        this.datas = datas;  // 공간 생성
     }
 
     @Override
@@ -105,7 +106,8 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
                 @Override
                 public void onClick(View v) {
                     setItemClicked(position);
-                    Player.play(musicUri, mView.getContext());
+                    Player.init(musicUri, mView.getContext(),null);
+                    Player.play();
                     btnPas.setImageResource(android.R.drawable.ic_media_pause);
 //                    btnPas.setVisibility(View.VISIBLE);
                 }
@@ -116,7 +118,6 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
                 @Override
                 public boolean onLongClick(View v) {
                     goDetail(position);
-
                     return true; // 롱 클릭 후 온클릭이 실행되지 않도록 함
                 }
             });
@@ -125,13 +126,13 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
             btnPas.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    switch(Player.playerstatus){
-                        case Player.PLAY:
+                    switch(Player.status){
+                        case Const.Player.PLAY:
                             Player.pause();
                             // pause 가 클릭되면 이미지 모양이 play 로 바뀐다.
                             btnPas.setImageResource(android.R.drawable.ic_media_play);
                             break;
-                        case Player.PAUSE:
+                        case Const.Player.PAUSE:
                             Player.replay();
                             btnPas.setImageResource(android.R.drawable.ic_media_pause);
                             break;
@@ -139,10 +140,5 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
                 }
             });
         }
-
-//        @Override
-//        public String toString() {
-//            return super.toString() + " '" + mContentView.getText() + "'";
-//        }
     }
 }

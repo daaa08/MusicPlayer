@@ -24,6 +24,7 @@ public class Music {
         items = new HashSet<>();
     }
 
+
     public static Music getInstance(){
         if(intance == null)
             intance = new Music();

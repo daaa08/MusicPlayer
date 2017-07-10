@@ -58,6 +58,8 @@ public class ListFragment extends Fragment {
             music.loader(getContext());  // 데이터를 미리 로드해 item에 담아둔다
 
             ListAdapter adapter = new ListAdapter(music.getItems(), mListener);
+            adapter.setDatas(music.getItems());
+
             recyclerView.setAdapter(adapter);
         }
         return view;

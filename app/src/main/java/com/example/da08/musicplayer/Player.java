@@ -3,6 +3,8 @@ package com.example.da08.musicplayer;
 import android.content.Context;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.Handler;
+import android.util.Log;
 
 /**
  * Created by Da08 on 2017. 6. 16..
@@ -10,37 +12,51 @@ import android.net.Uri;
 
 public class Player {
 
-    public static final int STOP = 0;
-    public static final int PLAY = 1;
-    public static final int PAUSE = 2;
-    public static MediaPlayer player = null;
-    public static int playerstatus = STOP;
+    private static MediaPlayer player = null;
+    public static int status = Const.Player.STOP;
 
 
-    public static void play(Uri musicUri, Context context) {
+    /**
+     * 음원을 세팅하는 함수
+     * @param musicUri
+     * @param context
+     * @param handler seekbar 를 조작하는 핸들러
+     */
+    // 음원 세팅
+    public static void init(Uri musicUri, Context context, final Handler handler){
         // 1 미디어 플레이어 사용하기
         if (player != null) {
             player.release();
         }
         player = MediaPlayer.create(context, musicUri);
-        // 2 설정
-        player.setLooping(false);  // 반복여부
-        // 3 시작
-        player.start();
-
-        playerstatus = PLAY;
-
+        player.setLooping(true); // 일단 무한반복
+        player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+                // 음악 플레이가 종료되면 호출된다.
+                // 이 때 seekBar thread를 멈춰야 한다.
+                if(handler != null)
+                    handler.sendEmptyMessage(DetailFragment.STOP_THREAD);
+            }
+        });
+        Log.d("Player","init======="+player);
     }
 
-    public static void pause() {
+    public static void play(){
+        player.start();
+        status = Const.Player.PLAY;
+    }
+
+    public static void pause(){
         player.pause();
-        playerstatus = PAUSE;
+        status = Const.Player.PAUSE;
     }
 
-    public static void replay() {
+    public static void replay(){
         player.start();
-        playerstatus = PLAY;
+        status = Const.Player.PLAY;
     }
+
     // 음원의 길이
     public static int getDuration(){
         if(player != null){
@@ -52,10 +68,20 @@ public class Player {
 
     // 현재 실행 구간
     public static int getCurrent(){
+        Log.d("Player","getCurrent======="+player);
         if(player != null){
-            return player.getCurrentPosition();
-        }else{
-            return 0;
+            try {
+                return player.getCurrentPosition();
+            }catch(Exception e){
+                Log.e("Player",e.toString());
+            }
         }
+        return 0;
     }
+    // current 로 실행구간 이동시키기
+    public static void setCurrent(int current){
+        if(player != null)
+            player.seekTo(current);
+    }
+
 }
